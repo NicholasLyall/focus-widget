@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Focus</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+  <div id="titlebar">FOCUS</div>
+
+  <div id="content">
+
+    <div id="mode-selector">
+      <label>
+        <input type="radio" name="mode" value="timed" checked>
+        Timed
+      </label>
+      <label>
+        <input type="radio" name="mode" value="untimed">
+        Untimed
+      </label>
+    </div>
+
+    <div id="duration-row">
+      <span>Duration:</span>
+      <input type="number" id="duration-input" value="25" min="1" max="999">
+      <span>minutes</span>
+    </div>
+
+    <button id="start-btn">START SESSION</button>
+
+    <div id="history-section">
+      <div id="history-label">History</div>
+      <div id="history-list">No sessions yet.</div>
+    </div>
+
+  </div>
+
+  <script src="panel.js"></script>
+</body>
+</html>

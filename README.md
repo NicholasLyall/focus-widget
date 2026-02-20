@@ -1,7 +1,8 @@
 # Focus Overlay (Windows)
 
-A lightweight **Windows desktop focus utility** that visually indicates a focus session by drawing a persistent red border around the screen and tracking time.  
-No website blocking. No hard lockdown. Just a clear, system-wide signal that you’re in focus mode.
+A **Windows desktop focus utility** with a control panel for starting focus sessions.
+During a session, a persistent red border fills the screen edge — a system-wide signal that you're locked in.
+No website blocking. Commitment enforced by you, not the app.
 
 Built with **JavaScript + Electron**.
 
@@ -9,40 +10,77 @@ Built with **JavaScript + Electron**.
 
 ## Why this exists
 
-Most “productivity” tools rely on aggressive blocking.  
-This app takes a different approach:
+Most "productivity" tools either do nothing or lock you out completely.
+This takes a middle path:
 
-- Encourage focus through **visual friction**, not enforcement  
-- Keep the user in control at all times  
-- Be system-wide, not tied to a browser  
-- Stay minimal and fast  
+- Visual friction that's hard to ignore but doesn't block your work
+- A commitment mechanic that makes quitting feel intentional, not easy
+- Session history so you can see your actual track record
+- Stays system-wide, not tied to a browser
 
-If the red border is on, you’re in focus mode.  
-If it’s off, you’re not.
+---
+
+## How it works
+
+1. App opens with a **control panel** — a small normal window in the center of your screen
+2. From the control panel you choose a mode and hit Start
+3. The control panel closes, the **red border overlay** appears fullscreen
+4. When the session ends (timer or manual), the overlay disappears and the control panel returns
+5. The session is logged
 
 ---
 
 ## Core Features (v1)
 
-- Fullscreen transparent overlay with a red perimeter  
-- Global keyboard shortcut to toggle focus mode  
-- Configurable focus duration  
-- Countdown timer  
-- Always-on-top overlay that does **not** block mouse or keyboard input  
-- Windows-only (for now)
+### Control Panel
+- Set a custom focus duration (minutes)
+- Choose **Timed Mode** or **Untimed Mode**
+- View session history (local, this session or stored)
+- Start / Stop controls
+
+### Overlay
+- Fullscreen transparent window with a red perimeter border
+- Countdown timer displayed in the corner
+- Always-on-top, click-through (does not block mouse or keyboard)
+
+### Quit Gate
+- Ending a session early requires typing a commitment phrase to confirm
+- e.g. `"I am a loser and I fail my goals"`
+- Makes rage-quitting feel intentional
+
+### Session Tracking
+- Each session logs: goal duration, actual duration, mode, success/fail
+- Stored locally (no cloud, no accounts)
 
 ---
 
-## Tech Stack
+## Modes
 
-- **Electron** (desktop runtime)  
-- **JavaScript**  
-- **HTML / CSS**  
-- **Node.js**  
+| Mode | How it ends |
+|------|-------------|
+| Timed | Timer runs out automatically — session marked success |
+| Untimed | You end it manually — always marked as a choice, not a failure |
+| Early quit | Requires typing the quit phrase — session marked failed |
 
-No backend.  
-No database.  
-No cloud services.
+---
+
+## State Model
+
+```text
+IDLE (control panel open)
+  ↓ Start
+FOCUS_ACTIVE (overlay on, control panel hidden)
+  ↓ Timer ends → SUCCESS → log session → IDLE
+  ↓ Quit early → type phrase → FAILED → log session → IDLE
+  ↓ Untimed stop → COMPLETE → log session → IDLE
+```
+
+State includes:
+- `active` (boolean)
+- `mode` ('timed' | 'untimed')
+- `startTime`
+- `duration` (null if untimed)
+- `sessions[]` (history log)
 
 ---
 
@@ -51,61 +89,39 @@ No cloud services.
 ```text
 focus-overlay/
 ├── package.json
-├── main.js            # Electron main process (windows, shortcuts, timers)
-├── preload.js         # Safe bridge between main & renderer (if needed)
+├── main.js                  # Electron main process (windows, state, timers)
+├── preload.js               # IPC bridge between main & renderer
+├── control-panel/
+│   ├── panel.html           # Control panel UI
+│   ├── panel.css            # Control panel styles
+│   └── panel.js             # Control panel logic (start, history, mode)
 ├── renderer/
-│   ├── index.html     # Overlay UI
-│   ├── style.css      # Red border + visuals
-│   └── renderer.js    # UI logic / countdown display
+│   ├── index.html           # Overlay UI
+│   ├── style.css            # Red border + visuals
+│   └── renderer.js          # Overlay logic (countdown display)
 └── README.md
 ```
 
 ---
 
-## How it works (high level)
+## Tech Stack
 
-1. Electron launches a **transparent, frameless, fullscreen window**
-2. The window draws a **red border** using CSS
-3. The window is:
-   - Always on top  
-   - Click-through (does not intercept input)  
-4. A **global hotkey** toggles focus mode  
-5. A timer tracks session duration  
-6. Turning focus mode off removes the overlay
+- **Electron** (desktop runtime)
+- **JavaScript**
+- **HTML / CSS**
+- **Node.js**
 
----
-
-## State Model
-
-The app intentionally stays simple.
-
-```text
-IDLE
-  ↓ (hotkey)
-FOCUS_ACTIVE
-  ↓ (timer ends OR hotkey)
-IDLE
-```
-
-State includes:
-- `active` (boolean)
-- `startTime`
-- `duration`
-
----
-
-## Keyboard Shortcuts (initial)
-
-- **Ctrl + Shift + F** → Toggle focus mode on/off
+No backend. No database. No cloud services.
+Session history stored in a local JSON file.
 
 ---
 
 ## Development Setup (Windows)
 
 ### Prerequisites
-- Windows 10 or newer  
-- Node.js (LTS recommended)  
-- Visual Studio Code  
+- Windows 10 or newer
+- Node.js (LTS recommended)
+- Visual Studio Code
 
 ### Install dependencies
 ```bash
@@ -119,40 +135,23 @@ npm start
 
 ---
 
+## Future Ideas (not v1)
+
+- **Rage mode**: instead of a border, lava fills the screen — bright red, eye-searing, designed to annoy you back into focus
+- Pomodoro cycles
+- Tray icon for quick access
+- Color fade as session progresses
+- Cross-platform support
+- Rewrite in Tauri (JS + Rust)
+
+---
+
 ## Design Principles
 
-- **Soft friction > hard restrictions**
-- **Minimal UI**
-- **No background services**
-- **No network dependency**
-- **Fast startup, low mental overhead**
-
-If a feature doesn’t support those principles, it doesn’t belong here.
-
----
-
-## Non-Goals (important)
-
-This project intentionally does **not**:
-
-- Block websites  
-- Disable apps  
-- Enforce productivity  
-- Track or upload personal data  
-- Sync across devices  
-
-Those can be explored later, but they are **out of scope for v1**.
-
----
-
-## Possible Extensions (future ideas)
-
-- Color fade as time progresses  
-- Pomodoro cycles  
-- Session history (local only)  
-- Tray icon controls  
-- Cross-platform support  
-- Rewrite using Tauri (JS + Rust)
+- **Commitment over blocking** — you can always quit, but it should cost something
+- **Minimal UI** — the control panel is a tool, not a product
+- **No cloud, no accounts** — your focus data stays on your machine
+- **Fast startup** — open it, start it, done
 
 ---
 
@@ -160,11 +159,11 @@ Those can be explored later, but they are **out of scope for v1**.
 
 This project is primarily about:
 
-- Desktop app architecture  
-- Electron main vs renderer processes  
-- Global input handling  
-- UI overlays  
-- Time-based state machines  
+- Desktop app architecture (two-window Electron apps)
+- Electron main vs renderer processes
+- IPC communication between windows
+- State machines with multiple modes
+- Local data persistence
 
 The focus is **learning by building**, not copying code.
 
@@ -172,5 +171,5 @@ The focus is **learning by building**, not copying code.
 
 ## Status
 
-🚧 In active development  
+🚧 In active development
 Built incrementally using **Claude Learning Mode** to encourage hands-on coding.

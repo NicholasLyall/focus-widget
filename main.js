@@ -2,6 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
 let overlayWindow = null;
+let panelWindow = null;
 
 function createOverlayWindow() {
   const options = {
@@ -19,6 +20,10 @@ function createOverlayWindow() {
   overlayWindow = new BrowserWindow(options);
   overlayWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   overlayWindow.setIgnoreMouseEvents(true);
+}
+
+function createControlPanel() {
+  
 }
 
 app.whenReady().then(() => {

@@ -1,0 +1,64 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #181414;
+  color: white;
+  font-family: "Segoe UI", sans-serif;
+}
+
+#titlebar {
+  -webkit-app-region: drag;
+  background-color: #2d0e0edd; 
+  color: white;
+  padding: 5px;
+  border-bottom: 1px solid #444; 
+
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+#mode-selector {
+}
+
+#duration-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#duration-input {
+  -webkit-app-region: no-drag;
+}
+
+#start-btn {
+  -webkit-app-region: no-drag;
+  /*might want it to be one of those circular hole you click, like multiple choice answers on google sheets*/
+  padding: 15px;
+  background-color: #1a1515;
+  color: white;
+  border: none;
+  cursor: pointer; 
+}
+
+#start-btn:hover {
+  background-color: #1d1717;
+}
+
+#history-section {
+  border-top: 1px solid #444;
+  padding-top: 12px;
+}
+
+#history-list {
+  font-size: 12px;
+  line-height: 1.6;
+}
