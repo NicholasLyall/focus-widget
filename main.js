@@ -23,11 +23,22 @@ function createOverlayWindow() {
 }
 
 function createControlPanel() {
-  
+  /* to my knowldge im using electron to create a window using the operating system, then my ui goes in that window*/
+  const options = {
+    width: 480,
+    height: 270,
+    frame: false,
+    resizable: false,
+    webPreferences: { preload: path.join(__dirname, 'preload.js') }
+  };
+  panelWindow = new BrowserWindow(options); 
+  panelWindow.loadFile(path.join(__dirname, 'control-panel', 'panel.html'));
 }
 
 app.whenReady().then(() => {
   createOverlayWindow();
+  overlayWindow.hide();
+  createControlPanel();
 });
 
 app.on('window-all-closed', () => {

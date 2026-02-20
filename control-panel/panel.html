@@ -7,17 +7,20 @@
 </head>
 <body>
 
-  <div id="titlebar">FOCUS</div>
+  <div id="titlebar">
+    FOCUS
+    <span id="close-btn">X</span>
+  </div>
 
   <div id="content">
 
     <div id="mode-selector">
       <label>
-        <input type="radio" name="mode" value="timed" checked>
+        <input type="radio" id="timed-radio" name="mode" value="timed" checked>
         Timed
       </label>
       <label>
-        <input type="radio" name="mode" value="untimed">
+        <input type="radio" id="untimed-radio" name="mode" value="untimed">
         Untimed
       </label>
     </div>
